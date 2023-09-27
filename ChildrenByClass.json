@@ -1,0 +1,31 @@
+local Utilities = {}
+
+
+function Utilities:GetChildrenByClass(class)
+	local children = self:GetChildren()
+	local result = {}
+	
+	for i = 1, #children do
+		local child = children[i]
+		if child:IsA(class) then
+			table.insert(result, child)
+		end
+	end
+	
+	return result
+end
+
+
+local ModuleMeta = {
+	__index = function(tbl, key)
+		if Utilities[key] then
+			return function(...)
+				return Utilities[key](tbl, ...)
+			end
+		end
+	end
+}
+
+setmetatable(Utilities, ModuleMeta)
+
+return Utilities
