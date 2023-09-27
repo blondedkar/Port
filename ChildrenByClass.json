@@ -1,8 +1,9 @@
+---Module Basecode in Luau
+
 local Utilities = {}
 
-
-function Utilities:GetChildrenByClass(class)
-	local children = self:GetChildren()
+function Utilities.GetChildrenByClass(parent: Instance,class: string): {}
+	local children = parent:GetChildren()
 	local result = {}
 	
 	for i = 1, #children do
@@ -11,21 +12,64 @@ function Utilities:GetChildrenByClass(class)
 			table.insert(result, child)
 		end
 	end
-	
 	return result
 end
 
+return Utilities
 
-local ModuleMeta = {
-	__index = function(tbl, key)
-		if Utilities[key] then
-			return function(...)
-				return Utilities[key](tbl, ...)
-			end
-		end
-	end
+---
+
+-Base Example:
+
+UtilityMethod = require(--DirectoryOfWhereModuleScriptIsFound)
+
+local ParentToReturnTableFrom = workspace:FindFirstChild(--Index the instance of which you want to receive the children from)
+
+print(#UtilityMethod.GetChildrenByClass(ParentToReturnTableFrom, "Instance")) --Will return a number
+
+--the print statement will return a number because of the # before the method is called. However if the # character were to be removed, the print statement would return a table containing all of the children 
+of the class "Instance" found under the ParentToReturnTableFrom.
+
+print(UtilityMethod.GetChildrenByClass(ParentToReturnTableFrom, "Instance")) --Will return a table
+
+
+-Practical Example
+
+local UtilityMethod = require(game:GetService(ReplicatedStorage.UtilityModule))
+
+local AssetFolder = workspace:FindFirstChild("assetPack") --example assetpack contains 3 models 5 unions and 2 BaseParts
+
+print(#UtilityMethod.GetChildrenByClass(AssetFolder, "UnionOperation"))-- Output will print 5 because of the # character
+
+print(UtilityMethod.GetChildrenByClass(AssetFolder, "BaseParts"))
+Output will print:
+
+{
+[1] = BasePartName1,
+[2] = BasePartName2 	
 }
 
-setmetatable(Utilities, ModuleMeta)
+---
 
-return Utilities
+The resulting table that is returned can be iterated on as normal, see example:
+
+local UtilityMethod = require(game:GetService(ReplicatedStorage.UtilityModule))
+
+local AssetFolder = workspace:FindFirstChild("assetPack") --example assetpack contains 3 models 5 unions and 2 BaseParts
+
+local ReturnedTable = UtilityMethod.GetChildrenByClass(AssetFolder, "BaseParts")
+
+
+for i, asset in (ReturnedTable) do
+	print(asset.Name)
+end
+
+--This will print sequentially:
+BasePartName1
+BasePartName2
+
+---
+
+
+
+
